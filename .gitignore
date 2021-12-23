@@ -1,0 +1,8 @@
+#Virtual Environment
+/venv
+
+#Python Static files
+/backend/__pycache__
+
+#node modules
+/frontend/node_modules
