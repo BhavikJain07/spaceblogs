@@ -1,9 +1,11 @@
-from flask import Flask,jsonify, request, render_template
+from flask import Flask,jsonify, request
 from newsapi import NewsApiClient
+from flask_cors import CORS, cross_origin
 import pyrebase
 import pickle as pkl
 app = Flask(__name__)
-
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 ###Initialize Firebase
 secrets = {}
 with open('secrets.dat','rb') as f:
@@ -17,16 +19,13 @@ db = firebase.database()
 
 ### Home Route ###
 @app.route('/')
+@cross_origin()
 def home():
-    return render_template('index.html')
-
-
-@app.route('/dash')
-def dashboard():
-    return render_template('dashboard.html')
+    return "Welcome to space blogs!!"
 
 ### News Section ###
 @app.route('/news')
+@cross_origin()
 def news():
     newsapi = NewsApiClient(api_key="2dd3b52f72744bedbec4d19810f86480") 
     top_headlines = newsapi.get_top_headlines(q='space',
@@ -36,10 +35,11 @@ def news():
 
 ### Blogs Route ###
 @app.route('/blogs', methods=['GET','POST'])
+@cross_origin()
 def blogs():
     if request.method == "POST":
-        userName = request.args['username']
-        blogContent = request.args['blog']
+        userName = request.json['username']
+        blogContent = request.json['blog']
         data = {
             "author": userName,
             "content": blogContent,
@@ -57,28 +57,32 @@ def blogs():
 
 ### Sign In/Out Section ###
 @app.route('/signin', methods=['GET','POST'])
+@cross_origin()
 def signin():
     if request.method == "POST":
-        email = request.args['email']
-        password = request.args['pass']
-        user = auth.sign_in_with_email_and_password(email,password)
-        userData = auth.get_account_info(user['idToken'])
-        print(userData)
-        return "True"
+        try:
+            email = request.json['email']
+            password = request.json['password']
+            user = auth.sign_in_with_email_and_password(email,password)
+            userData = auth.get_account_info(user['idToken'])
+            return jsonify({"email": userData['users'][0]['email'], "credential" : True})
+        except:
+            return jsonify({"email": "Invalid", "credential": False})
     else:
         return "Sign In API"
 
 ###Sigup section###
 @app.route('/signup', methods=['GET','POST'])
+@cross_origin()
 def signup():
     if request.method == "POST":
-        userEmail = request.args['email']
-        userPassword = request.args['pass']
+        userEmail = request.json['email']
+        userPassword = request.json['password']
         try:
             auth.create_user_with_email_and_password(userEmail, userPassword)
-            return '1'
+            return jsonify({"email": userEmail, "credential": True})
         except:
-            return '0'
+            return jsonify({"email": "userEmail", "credential": False})
     else:
         return "Sign Up API"
 
