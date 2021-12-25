@@ -1,4 +1,4 @@
-from flask import Flask,jsonify, request
+from flask import Flask,jsonify, request, render_template
 from newsapi import NewsApiClient
 import pyrebase
 import pickle as pkl
@@ -15,12 +15,17 @@ auth = firebase.auth()
 # database = firebase.database()
 db = firebase.database()
 
-###Home Route###
+### Home Route ###
 @app.route('/')
 def home():
-    return "This is not your place to be! Get Lost!!"
+    return render_template('index.html')
 
-###News Section ###
+
+@app.route('/dash')
+def dashboard():
+    return render_template('dashboard.html')
+
+### News Section ###
 @app.route('/news')
 def news():
     newsapi = NewsApiClient(api_key="2dd3b52f72744bedbec4d19810f86480") 
@@ -29,7 +34,7 @@ def news():
                                           category="technology")
     return jsonify(top_headlines)
 
-###Blogs Route###
+### Blogs Route ###
 @app.route('/blogs', methods=['GET','POST'])
 def blogs():
     if request.method == "POST":
@@ -50,17 +55,16 @@ def blogs():
                 BLOGS[i.key()] = i.val()
         return jsonify(BLOGS)
 
-###Sign In/Out Section###
+### Sign In/Out Section ###
 @app.route('/signin', methods=['GET','POST'])
 def signin():
     if request.method == "POST":
-        userEmail = request.args['email']
-        userPassword = request.args['pass']
-        try:
-            auth.sign_in_with_email_and_password(userEmail, userPassword)
-            return '1'
-        except:
-            return '0'
+        email = request.args['email']
+        password = request.args['pass']
+        user = auth.sign_in_with_email_and_password(email,password)
+        userData = auth.get_account_info(user['idToken'])
+        print(userData)
+        return "True"
     else:
         return "Sign In API"
 
