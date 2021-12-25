@@ -17,15 +17,9 @@ function App() {
     <section id="about">
         <h1>About</h1>
         <p>
-            This is a landing page with a full screen video background. Feel free to
-            use this landing page in your projects. keep adding sections, change the
-            video, content , etc
+            Space blogs is your one stop for the latest news and insightful articles
+            about space.
         </p>
-    
-        <h2>Follow Me On Social Media</h2>
-    
-        <div class="social">
-        </div>
     </section>
     </div>
   );
