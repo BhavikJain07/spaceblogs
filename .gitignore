@@ -6,3 +6,11 @@
 
 #node modules
 /frontend/node_modules
+
+#firebase files
+.firebaserc
+firebase.json
+/.firebase
+
+#log files
+*.log
