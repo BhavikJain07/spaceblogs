@@ -29,8 +29,7 @@ def home():
 def news():
     newsapi = NewsApiClient(api_key="2dd3b52f72744bedbec4d19810f86480") 
     top_headlines = newsapi.get_top_headlines(q='space',
-                                          language='en',
-                                          category="technology")
+                                          language='en')
     return jsonify(top_headlines)
 
 ### Blogs Route ###
