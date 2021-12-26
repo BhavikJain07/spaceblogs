@@ -1,4 +1,5 @@
-from flask import Flask,jsonify, request
+import re
+from flask import Flask, json,jsonify, request
 from newsapi import NewsApiClient
 from flask_cors import CORS, cross_origin
 import pyrebase
@@ -7,9 +8,14 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 ###Initialize Firebase
-secrets = {}
-with open('secrets.dat','rb') as f:
-    secrets = pkl.load(f)
+secrets = {'apiKey': "AIzaSyDR8tFTYqMqSYI6K1HAjJBfeS774o3aU5o",
+    'authDomain': "spaceblogs.firebaseapp.com",
+    'projectId': "spaceblogs",
+    'storageBucket': "spaceblogs.appspot.com",
+    'messagingSenderId': "113377744070",
+    'appId': "1:113377744070:web:60c5f3e34e25b60987b3c7",
+    'measurementId': "G-PG3VEDCTC8",
+    'databaseURL' : "https://spaceblogs-default-rtdb.asia-southeast1.firebasedatabase.app/"}
 firebase = pyrebase.initialize_app(secrets)
 
 ###Initialize Firebase methods
@@ -37,22 +43,34 @@ def news():
 @cross_origin()
 def blogs():
     if request.method == "POST":
-        userName = request.json['username']
-        blogContent = request.json['blog']
-        data = {
-            "author": userName,
-            "content": blogContent,
-            "status" : "pending"
-        }
-        db.child('blogs').push(data)
-        return '1'
+        try:
+            urlToImage = request.json['urlToImage']
+            title = request.json['title']
+            author = request.json['author']
+            content = request.json['content']
+            description = request.json['description']
+            publishedAt = request.json['publishedAt']
+            data = {
+                "urlToImage" : urlToImage,
+                "title" : title,
+                "author" : author,
+                "content" : content,
+                "description" : description,
+                "publishedAt" : publishedAt,
+                "status" : "pending"
+            }
+            db.child('blogs').push(data)
+            return '1'
+        except:
+            return '0'
     else:
         blogs = db.child('blogs').get()
-        BLOGS = {}
-        for i in blogs:
-            if i.val()['status'] == "approved":
-                BLOGS[i.key()] = i.val()
-        return jsonify(BLOGS)
+        res = {"articles": []}
+        for i in blogs.val():
+            if blogs.val()[i]["status"] == "approved":
+                blogs.val()[i]["id"] = i
+                res['articles'].append(blogs.val()[i])  
+        return jsonify(res)
 
 ### Sign In/Out Section ###
 @app.route('/signin', methods=['GET','POST'])
@@ -84,6 +102,17 @@ def signup():
             return jsonify({"email": "userEmail", "credential": False})
     else:
         return "Sign Up API"
+
+### Blog Post Route ###
+@app.route('/blogpost', methods=['GET', 'POST'])
+@cross_origin()
+def blogpost():
+    if request.method == "POST":
+        blogId = request.json['id']
+        blogs = db.child('blogs').get()
+        return blogs.val()[blogId]
+    else:
+        return 'Blog Post API'
 
 if __name__ == "__main__":
     app.run(
