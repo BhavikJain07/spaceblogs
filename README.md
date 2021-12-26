@@ -12,3 +12,7 @@ We are so proud to accomplish the completion of this project and we are also pro
 We learnt a lot from this project, and this hackathon in general. This has given us oppurtunity to work on something we have never done before like merging a react application with flask etc.
 ## What's next for Space Blogs
 The next step for space blogs is to make it more robust. Migrate it from the testing db and servers to a production grade environment, and yes more fun features are on thier way..........
+## Demo Credentials
+Use the following credentials for demo testing or feel free to create your very own account
+Demo Email : demo@spaceblogs.study 
+Demo Password : demotestingpassword
