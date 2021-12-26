@@ -1,9 +1,7 @@
-import re
 from flask import Flask, json,jsonify, request
 from newsapi import NewsApiClient
 from flask_cors import CORS, cross_origin
 import pyrebase
-import pickle as pkl
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
